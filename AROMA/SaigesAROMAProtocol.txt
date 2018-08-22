@@ -1,0 +1,29 @@
+ICA-AROMA Protocol
+
+Prerequisites: 
+1.)	       File list (*.txt) of subject directories that have preprocessed data (smoothed files)
+2.)	       Motion parameters from realignment (*.txt) 
+3.)	       TR of data
+4.)	       Python 2.7 
+5.)	       FSL
+Running the scripts:
+1.)	AROMA.sh 
+This is a bash script that points to: 
+-your python directory [ex. /usr/bin/python2.7]
+-directory containing ICA_AROMA.py script [ex. /home/slab/users/mangstad/repos/ICA-AROMA/ICA_AROMA.py]
+ (note that ICA_AROMA_functions.py should be in the same directory as ICA_AROMA.py) 
+-in input filename (don’t edit if using batch_AROMA.sh)
+-out output directory name (don’t edit if using batch_AROMA.sh)
+-mc motion file name containing 6 column-wise realignment parameters [ex. ${DIR}/rp*.txt
+-m brain mask 
+-tr TR of your data
+-den type of de-noising strategy (aggressive and nonaggressive)
+Please read AROMA manual for additional options.  
+2.)    batch_AROMA.sh
+This is a bash script that allows you to run the AROMA.sh script in parallel, multiple subjects at once, to decrease processing time. ${FILE} variable is a (*.txt) file that contains a list of subject directories.  ${MAXPROCS} is the number of parallel processes (# of subjects) to run at the same time. To run batch_AROMA.sh you need to edit the script to specify the path to AROMA.sh script [ex. /net/parasite/SchizConnect/Scripts/AROMA/AROMA.sh] and also edit the path to your data [ex. /net/parasite/SchizConnect/Sites/COBRE/sub/func/s6w3rtrest.nii] do not change the sub variable, as this is a placeholder variable for all of your subjects specified in the ${FILE} variable.  
+Command to run this script: bash batch_AROMA.sh sublist.txt 10 
+This would run AROMA for 10 subjects at a time on all of the subjects specified in sublist.txt
+3.)  Denoise.sh
+This script is run only if you will use the Methods Core ConnTool script to create connectivity matrices after you have run AROMA. ConnTool requires an unsmoothed file to extract the CSF and WM confounds from. It usually the run file that is in MNI space but prior to smoothing. The idea is that you don't want gray smoothed into the CSF or WM regions (confoundFile variable).  This script needs a file list (*.txt) with the full path to each subject’s normalized file. See example_file_list_to_use_for_Denoise_script.txt for an example. 
+Command to run this script: cat w3filelist.txt | xargs –n 1 –P 1 –I file bash Denoise.sh file
+you can change the number after –P to run in parallel. 
